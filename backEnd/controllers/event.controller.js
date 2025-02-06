@@ -173,3 +173,16 @@ module.exports.deleteEvent = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+module.exports.getEventsByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    if (!categoryId) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    const events = await eventService.getEventsByCategory(categoryId);
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

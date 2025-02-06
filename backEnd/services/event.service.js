@@ -157,6 +157,17 @@ const searchEvents = async (filters) => {
   }
 };
 
+const getEventsByCategory = async (categoryId) => {
+  try {
+    const events = await Event.find({ category: categoryId }).populate(
+      "category"
+    );
+    return events;
+  } catch (err) {
+    throw new Error("Error fetching events by category: " + err.message);
+  }
+};
+
 const deleteEvent = async (eventId, userId) => {
   try {
     const event = await Event.findById(eventId);
@@ -183,4 +194,5 @@ module.exports = {
   rsvpForEvent,
   searchEvents,
   deleteEvent,
+  getEventsByCategory,
 };

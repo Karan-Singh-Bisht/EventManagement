@@ -9,6 +9,7 @@ const {
   rsvpForEvent,
   searchEvents,
   deleteEvent,
+  getEventsByCategory,
 } = require("../controllers/event.controller");
 const verifyUserToken = require("../middleware/verifyUserToken");
 const upload = require("../middleware/multer.middleware");
@@ -21,5 +22,6 @@ router.get("/:eventId", verifyUserToken, showEvent);
 router.get("/:eventId/attendees", verifyUserToken, showEventAttendees);
 router.post("/:eventId/rsvp", verifyUserToken, rsvpForEvent);
 router.delete("/:eventId", verifyUserToken, deleteEvent);
+router.get("/category/:categoryId", verifyUserToken, getEventsByCategory);
 
 module.exports = router;

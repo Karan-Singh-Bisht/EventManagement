@@ -38,6 +38,7 @@ const eventSchema = new mongoose.Schema(
       required: true,
     },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   },
   { timestamps: true }
 );

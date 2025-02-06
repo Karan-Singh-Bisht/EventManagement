@@ -45,10 +45,12 @@ const authRoute = require("./routes/auth.routes");
 const userRoute = require("./routes/user.routes");
 const eventRoute = require("./routes/event.routes");
 // const adminRoute = require("./routes/admin.routes");
+const categoriesRoute = require("./routes/category.routes");
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/event", eventRoute);
+app.use("/api/v1/categories", categoriesRoute);
 // app.use("/api/v1/admin", adminRoute);
 
 const PORT = process.env.PORT || 3000;
