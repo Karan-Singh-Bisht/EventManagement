@@ -3,7 +3,7 @@ const authService = require("../services/auth.service");
 
 module.exports.signupUser = async (req, res) => {
   try {
-    const newUser = await authService.createUser(req.body);
+    const newUser = await authService.createUser(req);
     if (!newUser) {
       return res.status(400).json({ message: "Failed to create user" });
     }
@@ -16,6 +16,7 @@ module.exports.signupUser = async (req, res) => {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        avatar: newUser.avatar,
       },
       token: token,
     });

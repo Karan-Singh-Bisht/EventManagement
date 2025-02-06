@@ -11,10 +11,11 @@ const {
   deleteEvent,
 } = require("../controllers/event.controller");
 const verifyUserToken = require("../middleware/verifyUserToken");
+const upload = require("../middleware/multer.middleware");
 
 router.get("/filter", searchEvents);
-router.post("/create", verifyUserToken, createEvent);
-router.put("/:eventId/updateStatus", verifyUserToken, updateEvent);
+router.post("/create", verifyUserToken, upload.single("image"), createEvent);
+router.put("/:eventId/updateEvent", verifyUserToken, updateEvent);
 router.get("/", showAllEvents);
 router.get("/:eventId", verifyUserToken, showEvent);
 router.get("/:eventId/attendees", verifyUserToken, showEventAttendees);

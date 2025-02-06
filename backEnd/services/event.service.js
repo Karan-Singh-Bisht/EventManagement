@@ -1,13 +1,23 @@
 const Event = require("../models/event.model");
+const uploadOnCloudinary = require("../utils/cloudinary");
 
 const createEvent = async (eventData) => {
   try {
-    const { name, description, date, location, user, io } = eventData;
+    const { name, description, date, location, user, files, io } = eventData;
+    const eventImageLocalPath = files?.path;
+    if (!eventImageLocalPath) {
+      throw new Error("Event image is required");
+    }
+    const eventImage = await uploadOnCloudinary(eventImageLocalPath);
+    if (!eventImage) {
+      throw new Error("Failed to upload event image");
+    }
     const newEvent = await Event.create({
       name,
       description,
       date,
       location,
+      image: eventImage.url,
       user,
     });
 

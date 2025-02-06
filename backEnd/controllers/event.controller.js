@@ -6,6 +6,7 @@ module.exports.createEvent = async (req, res) => {
   try {
     const { name, description, date, location } = req.body;
     const user = req.user.id;
+    const files = req.file;
     const io = req.app.get("socketio");
     const newEvent = await eventService.createEvent({
       name,
@@ -13,6 +14,7 @@ module.exports.createEvent = async (req, res) => {
       date,
       location,
       user,
+      files,
       io,
     });
     if (!newEvent) {

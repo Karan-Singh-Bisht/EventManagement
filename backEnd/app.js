@@ -17,7 +17,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.static(path.join("public")));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

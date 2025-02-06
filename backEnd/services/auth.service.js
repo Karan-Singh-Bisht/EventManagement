@@ -1,15 +1,25 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const uploadOnCloudinary = require("../utils/cloudinary");
 
-const createUser = async (userData) => {
+const createUser = async (req) => {
   try {
-    const { name, email, password } = userData;
+    const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new Error("User already exists");
     }
-    const newUser = await User.create({ name, email, password });
+    const avatarLocalPath = req.file?.path;
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+      avatar: avatar.url || "",
+    });
     if (!newUser) {
       throw new Error("Failed to create user");
     }
