@@ -1,10 +1,9 @@
 const eventService = require("../services/event.service");
-const io = require("socket.io");
 const Event = require("../models/event.model");
 
 module.exports.createEvent = async (req, res) => {
   try {
-    const { name, description, date, location } = req.body;
+    const { name, description, date, location, time, category } = req.body;
     const user = req.user.id;
     const files = req.file;
     const io = req.app.get("socketio");
@@ -16,10 +15,14 @@ module.exports.createEvent = async (req, res) => {
       user,
       files,
       io,
+      time,
+      category,
     });
     if (!newEvent) {
       return res.status(400).json({ message: "Failed to create event" });
     }
+
+    io.emit("newEventCreated", newEvent);
 
     res.status(201).json(newEvent);
   } catch (err) {
@@ -30,9 +33,10 @@ module.exports.createEvent = async (req, res) => {
 module.exports.updateEvent = async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const { status, name, description, location, date } = req.body;
+    const { status, name, description, category, location, date } = req.body;
     const userId = req.user.id;
     const io = req.app.get("socketio");
+    const files = req.file;
 
     const updatedFields = {};
 
@@ -42,11 +46,17 @@ module.exports.updateEvent = async (req, res) => {
     if (date) updatedFields.date = date;
     if (status) {
       // Status validation
-      const validStatuses = ["upcoming", "ongoing", "canceled", "ongoing"];
+      const validStatuses = ["upcoming", "ongoing", "canceled", "completed"];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid status value" });
       }
       updatedFields.status = status;
+    }
+    if (files) {
+      updatedFields.image = files.path;
+    }
+    if (category) {
+      updatedFields.category = category;
     }
 
     if (Object.keys(updatedFields).length === 0) {
@@ -132,6 +142,11 @@ module.exports.rsvpForEvent = async (req, res) => {
       action,
       io
     );
+
+    io.to(eventId).emit("attendeeCountUpdated", {
+      eventId,
+      attendees: updatedEvent.attendees.length, // Send updated count
+    });
 
     res.status(200).json(updatedEvent);
   } catch (err) {

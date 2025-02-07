@@ -12,6 +12,7 @@ const categorySchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    events: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
     createdAt: {
       type: Date,
       default: Date.now,

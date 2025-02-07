@@ -10,7 +10,6 @@ const eventSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      unique: true,
     },
     date: {
       type: Date,
@@ -20,6 +19,16 @@ const eventSchema = new mongoose.Schema(
           return value >= new Date();
         },
         message: "Event date must be in the future",
+      },
+    },
+    time: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (value) {
+          return /^(0[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/i.test(value); // Validates "hh:mm AM/PM" format
+        },
+        message: "Time must be in hh:mm AM/PM format",
       },
     },
     status: {
@@ -38,7 +47,19 @@ const eventSchema = new mongoose.Schema(
       required: true,
     },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    category: {
+      type: String,
+      enum: [
+        "sports",
+        "music",
+        "conference",
+        "meet",
+        "workshop",
+        "tech",
+        "art",
+      ],
+      required: true,
+    },
   },
   { timestamps: true }
 );

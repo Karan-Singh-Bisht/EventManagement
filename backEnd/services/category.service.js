@@ -14,7 +14,7 @@ const createCategory = async (name, description) => {
 
 const getAllCategories = async () => {
   try {
-    return await Category.find();
+    return await Category.find().populate("events");
   } catch (err) {
     throw new Error("Error fetching categories: " + err.message);
   }

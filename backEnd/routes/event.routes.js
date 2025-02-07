@@ -16,7 +16,12 @@ const upload = require("../middleware/multer.middleware");
 
 router.get("/filter", searchEvents);
 router.post("/create", verifyUserToken, upload.single("image"), createEvent);
-router.put("/:eventId/updateEvent", verifyUserToken, updateEvent);
+router.put(
+  "/:eventId/updateEvent",
+  verifyUserToken,
+  upload.single("image"),
+  updateEvent
+);
 router.get("/", showAllEvents);
 router.get("/:eventId", verifyUserToken, showEvent);
 router.get("/:eventId/attendees", verifyUserToken, showEventAttendees);

@@ -3,7 +3,17 @@ const uploadOnCloudinary = require("../utils/cloudinary");
 
 const createEvent = async (eventData) => {
   try {
-    const { name, description, date, location, user, files, io } = eventData;
+    const {
+      name,
+      description,
+      date,
+      location,
+      user,
+      files,
+      io,
+      category,
+      time,
+    } = eventData;
     const eventImageLocalPath = files?.path;
     if (!eventImageLocalPath) {
       throw new Error("Event image is required");
@@ -19,13 +29,13 @@ const createEvent = async (eventData) => {
       location,
       image: eventImage.url,
       user,
+      category,
+      time,
     });
 
     if (!newEvent) {
       throw new Error("Failed to create event");
     }
-
-    io.emit("newEventCreated", newEvent);
 
     return newEvent;
   } catch (e) {
@@ -40,9 +50,18 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
     if (!event) {
       throw new Error("Event not found");
     }
-    if (event.user.toString() !== userId) {
+
+    console.log(event, userId);
+
+    if (event.user.toString() !== userId.toString()) {
       throw new Error("Unauthorized to update event");
     }
+
+    if (updatedFields.image) {
+      const eventImage = await uploadOnCloudinary(updatedFields.image);
+      updatedFields.image = eventImage?.url || event.image;
+    }
+
     const updatedEvent = await Event.findByIdAndUpdate(
       eventId,
       { $set: updatedFields }, //only update the provided fields
@@ -53,7 +72,7 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
     }
 
     // Emit real-time event status update
-    io.to(eventId).emit("eventStatusUpdated", {
+    io.to(eventId).emit("eventUpdated", {
       eventId,
       status: event.status,
     });
@@ -125,10 +144,6 @@ const rsvpForEvent = async (eventId, userId, action, io) => {
 
     const updatedEvent = await event.save();
 
-    io.to(eventId).emit("eventAttendeesUpdated", {
-      updatedEvent,
-    });
-
     return updatedEvent;
   } catch (err) {
     console.log(err);
@@ -170,11 +185,11 @@ const getEventsByCategory = async (categoryId) => {
 
 const deleteEvent = async (eventId, userId) => {
   try {
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(eventId).populate("user");
     if (!event) {
       throw new Error("Event not found");
     }
-    if (event.user === userId) {
+    if (event.user._id.toString() == userId.toString()) {
       await Event.findByIdAndDelete(eventId);
       return "Event deleted successfully";
     }

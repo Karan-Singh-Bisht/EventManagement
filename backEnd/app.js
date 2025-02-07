@@ -9,6 +9,7 @@ db();
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -17,9 +18,9 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -34,6 +35,16 @@ io.on("connection", (socket) => {
     console.log(`User joined event ${eventId}`);
   });
 
+  socket.on("eventCreated", (eventData) => {
+    console.log("Received eventData :", eventData);
+    io.emit("new event", eventData);
+  });
+
+  socket.on("eventUpdated", (eventData) => {
+    console.log("Received eventData :", eventData);
+    io.to(eventData?.eventId).emit("eventUpdated", eventData);
+  });
+
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
@@ -44,16 +55,14 @@ app.set("socketio", io);
 const authRoute = require("./routes/auth.routes");
 const userRoute = require("./routes/user.routes");
 const eventRoute = require("./routes/event.routes");
-// const adminRoute = require("./routes/admin.routes");
 const categoriesRoute = require("./routes/category.routes");
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/event", eventRoute);
 app.use("/api/v1/categories", categoriesRoute);
-// app.use("/api/v1/admin", adminRoute);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
