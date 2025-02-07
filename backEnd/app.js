@@ -28,20 +28,15 @@ app.get("/", (req, res) => {
 
 // WebSocket Connection
 io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
-
   socket.on("joinEvent", (eventId) => {
     socket.join(eventId);
-    console.log(`User joined event ${eventId}`);
   });
 
   socket.on("eventCreated", (eventData) => {
-    console.log("Received eventData :", eventData);
     io.emit("new event", eventData);
   });
 
   socket.on("eventUpdated", (eventData) => {
-    console.log("Received eventData :", eventData);
     io.to(eventData?.eventId).emit("eventUpdated", eventData);
   });
 

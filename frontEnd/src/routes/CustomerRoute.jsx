@@ -7,6 +7,7 @@ import HomePage from "../customer/pages/HomePage";
 import Modal from "../customer/components/Modal";
 import CreateEvent from "../customer/components/CreateEvent";
 import UpdateEvent from "../customer/components/UpdateEvent";
+import NotFound from "../customer/pages/NotFound";
 
 const CustomerRoute = () => {
   return (
@@ -17,9 +18,10 @@ const CustomerRoute = () => {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<SignUpForm />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/createEvent" element={<CreateEvent />} />
         <Route path="/update/:eventId" element={<UpdateEvent />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

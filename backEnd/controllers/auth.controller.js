@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
 const authService = require("../services/auth.service");
+const bcrypt = require("bcrypt");
 
 module.exports.signupUser = async (req, res) => {
   try {
     const newUser = await authService.createUser(req);
     if (!newUser) {
-      return res.status(400).json({ message: "Failed to create user" });
+      return res.status(400).json({ message: "Cannot Create User" });
     }
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -21,18 +22,23 @@ module.exports.signupUser = async (req, res) => {
       token: token,
     });
   } catch (err) {
-    return res.status(500).json({ message: "Cannot create user" });
+    return res.status(500).json({ message: "User Already Registered" });
   }
 };
 
 module.exports.loginUser = async (req, res) => {
   try {
-    const user = await authService.loginUser(req.body);
+    const { email, password } = req.body;
+    const user = await authService.getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid  password" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "24h",
     });
     return res.status(200).json({
       message: "User logged in successfully",

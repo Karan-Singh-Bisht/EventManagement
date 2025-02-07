@@ -50,6 +50,7 @@ export default function EventCard({ event }) {
       />
       <h3 className="text-lg font-semibold mt-2">{event.name}</h3>
       <p className="text-sm text-gray-600">
+        {/* Slicing Date to only include date and not other non-essential data */}
         {event.date.slice(0, 10)} • {event.time} • {event.location}
       </p>
       <div className="flex gap-2">
@@ -68,7 +69,7 @@ export default function EventCard({ event }) {
           >
             Join
           </button>
-          {auth?.user?.id === event?.user ? (
+          {auth?.user?.user?._id === event?.user ? (
             <button
               onClick={handleRouting}
               className="mt-4 bg-indigo-600 font-semibold text-white py-2 px-4 rounded-md hover:bg-indigo-500"
@@ -79,7 +80,7 @@ export default function EventCard({ event }) {
             ""
           )}
         </div>
-        {auth?.user?.id === event?.user && (
+        {auth?.user?.user?._id === event?.user && (
           <button
             onClick={handleEventDelete}
             className="mt-4 mr-2 bg-red-600 font-semibold text-white py-2 px-4 rounded-md hover:bg-red-500"

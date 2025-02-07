@@ -5,6 +5,7 @@ import { updateEvent } from "../../state/Event/eventSlice";
 import { toast } from "sonner";
 import { axiosInstance } from "../../config/apiConfig";
 import { socket } from "../../config/socket";
+import LoadingOverlay from "./LoadingOverLay";
 
 const categories = [
   { value: "sports", label: "Sports" },
@@ -28,7 +29,7 @@ const UpdateEvent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [eventData, setEventData] = useState(null);
-  const { loading, error } = useSelector((state) => state.events);
+  const { loading } = useSelector((state) => state.events);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -46,13 +47,14 @@ const UpdateEvent = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
 
-    const time24 = formData?.get("time");
+    // Convert time from 24hr to 12hr format
+    const time24 = formData.get("time");
     const [hours, minutes] = time24.split(":");
     const suffix = hours >= 12 ? "PM" : "AM";
     const hours12 = (hours % 12 || 12).toString().padStart(2, "0");
     const formattedTime = `${hours12}:${minutes} ${suffix}`;
 
-    const eventData = {
+    const eventDataPayload = {
       name: formData.get("name"),
       description: formData.get("description"),
       category: formData.get("category"),
@@ -62,134 +64,167 @@ const UpdateEvent = () => {
       location: formData.get("location"),
     };
 
-    Object.keys(eventData).forEach((key) => {
-      formData.set(key, eventData[key]);
+    // Update formData with our formatted values
+    Object.keys(eventDataPayload).forEach((key) => {
+      formData.set(key, eventDataPayload[key]);
     });
 
     const event = await dispatch(updateEvent({ formData, eventId }));
 
-    // Emit WebSocket event
     if (event) {
       socket.emit("eventUpdated", event.payload);
       toast.success("Event updated successfully");
-      navigate("/home");
+      navigate("/");
     } else {
-      toast.error("Failed to create event");
+      toast.error("Failed to update event");
     }
   };
 
-  if (!eventData) return <p>Loading...</p>;
+  if (!eventData)
+    return <p className="text-center mt-10 text-gray-600">Loading...</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-2xl font-bold mb-4">Update Event</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Event Name</label>
-          <input
-            name="name"
-            type="text"
-            defaultValue={eventData.name}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Description</label>
-          <textarea
-            name="description"
-            defaultValue={eventData.description}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-        </div>
-
-        <div className="flex gap-4">
-          <div className="mb-4 w-1/2">
-            <label className="block font-semibold mb-2">Date</label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4">
+      <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6 md:p-8">
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+          Update Event
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Event Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Event Name
+            </label>
             <input
-              type="date"
-              name="date"
-              defaultValue={eventData.date ? eventData.date.split("T")[0] : ""}
-              className="w-full p-2 border rounded-md"
+              name="name"
+              type="text"
+              defaultValue={eventData.name}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               required
             />
           </div>
-          <div className="mb-4 w-1/2">
-            <label className="block font-semibold mb-2">Time</label>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              defaultValue={eventData.description}
+              rows="4"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            ></textarea>
+          </div>
+
+          {/* Date & Time */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                name="date"
+                defaultValue={
+                  eventData.date ? eventData.date.split("T")[0] : ""
+                }
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Time
+              </label>
+              <input
+                type="time"
+                name="time"
+                defaultValue={eventData.time ? eventData.time.slice(0, 5) : ""}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
             <input
-              type="time"
-              name="time"
-              defaultValue={eventData.time ? eventData.time.slice(0, 5) : ""}
-              className="w-full p-2 border rounded-md"
+              type="text"
+              name="location"
+              defaultValue={eventData.location}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               required
             />
           </div>
-        </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Location</label>
-          <input
-            type="text"
-            name="location"
-            defaultValue={eventData.location}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-        </div>
+          {/* Status & Category */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                defaultValue={eventData.status}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+              >
+                {statuses.map((status) => (
+                  <option key={status.value} value={status.value}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                name="category"
+                defaultValue={eventData.category}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+              >
+                {categories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Status</label>
-          <select
-            name="status"
-            defaultValue={eventData.status}
-            className="w-full p-2 border rounded-md"
-            required
+          {/* Image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Image
+            </label>
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
           >
-            {statuses.map((status) => (
-              <option key={status.value} value={status.value}>
-                {status.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Category</label>
-          <select
-            name="category"
-            defaultValue={eventData.category}
-            className="w-full p-2 border rounded-md"
-            required
-          >
-            {categories.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Image</label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
-          disabled={loading}
-        >
-          {loading ? "Updating" : "Update"}
-        </button>
-      </form>
+            {loading ? "Updating..." : "Update Event"}
+          </button>
+        </form>
+        <LoadingOverlay loading={loading} message="Updating" />
+      </div>
     </div>
   );
 };

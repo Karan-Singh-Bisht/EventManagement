@@ -8,6 +8,7 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
@@ -23,7 +24,6 @@ function classNames(...classes) {
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../../state/Auth/authSlice";
 import { toast } from "sonner";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Navigation() {
@@ -63,11 +63,12 @@ export default function Navigation() {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-              <img
-                alt="Your Company"
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                className="h-8 w-auto"
-              />
+              <h1
+                onClick={() => navigate("/home")}
+                className="text-3xl hover:cursor-pointer md:text-5.5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-lg"
+              >
+                EM
+              </h1>
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
@@ -127,7 +128,7 @@ export default function Navigation() {
                   <span className="sr-only">Open user menu</span>
                   <img
                     alt=""
-                    src={auth.user.avatar}
+                    src={auth?.user?.avatar}
                     className="size-8 rounded-full"
                   />
                 </MenuButton>

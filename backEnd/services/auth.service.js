@@ -30,25 +30,19 @@ const createUser = async (req) => {
   }
 };
 
-const loginUser = async (userData) => {
+// Get user by email
+const getUserByEmail = async (email) => {
   try {
-    const { email, password } = userData;
-    if (!email) {
-      throw new Error("Please provide email");
-    }
     const user = await User.findOne({ email });
+
     if (!user) {
-      throw new Error("Invalid email");
+      throw new Error(`User not found with email ${email}`);
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new Error("Invalid password");
-    }
+
     return user;
   } catch (err) {
-    console.error(err.message);
     throw err;
   }
 };
 
-module.exports = { createUser, loginUser };
+module.exports = { createUser, getUserByEmail };

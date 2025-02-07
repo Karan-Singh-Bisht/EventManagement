@@ -3,17 +3,8 @@ const uploadOnCloudinary = require("../utils/cloudinary");
 
 const createEvent = async (eventData) => {
   try {
-    const {
-      name,
-      description,
-      date,
-      location,
-      user,
-      files,
-      io,
-      category,
-      time,
-    } = eventData;
+    const { name, description, date, location, user, files, category, time } =
+      eventData;
     const eventImageLocalPath = files?.path;
     if (!eventImageLocalPath) {
       throw new Error("Event image is required");
@@ -51,8 +42,6 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
       throw new Error("Event not found");
     }
 
-    console.log(event, userId);
-
     if (event.user.toString() !== userId.toString()) {
       throw new Error("Unauthorized to update event");
     }
@@ -72,7 +61,7 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
     }
 
     // Emit real-time event status update
-    io.to(eventId).emit("eventUpdated", {
+    io.to(eventId).emit("attendeeCountUpdated", {
       eventId,
       status: event.status,
     });
@@ -172,11 +161,9 @@ const searchEvents = async (filters) => {
   }
 };
 
-const getEventsByCategory = async (categoryId) => {
+const getEventsByCategory = async (categoryName) => {
   try {
-    const events = await Event.find({ category: categoryId }).populate(
-      "category"
-    );
+    const events = await Event.find({ category: categoryName });
     return events;
   } catch (err) {
     throw new Error("Error fetching events by category: " + err.message);

@@ -143,10 +143,8 @@ module.exports.rsvpForEvent = async (req, res) => {
       io
     );
 
-    io.to(eventId).emit("attendeeCountUpdated", {
-      eventId,
-      attendees: updatedEvent.attendees.length, // Send updated count
-    });
+    // Emit the full updated event object
+    io.to(eventId).emit("attendeeCountUpdated", updatedEvent);
 
     res.status(200).json(updatedEvent);
   } catch (err) {
@@ -156,7 +154,6 @@ module.exports.rsvpForEvent = async (req, res) => {
 
 module.exports.searchEvents = async (req, res) => {
   try {
-    console.log(req.query);
     const { name, location, date } = req.query;
     const filters = { name, location, date };
 
@@ -191,11 +188,17 @@ module.exports.deleteEvent = async (req, res) => {
 
 module.exports.getEventsByCategory = async (req, res) => {
   try {
-    const { categoryId } = req.params;
-    if (!categoryId) {
-      return res.status(404).json({ message: "Category not found" });
+    const { categoryName } = req.params;
+
+    if (categoryName === "") {
+      return await Event.find();
     }
-    const events = await eventService.getEventsByCategory(categoryId);
+    const events = await eventService.getEventsByCategory(categoryName);
+    if (!events) {
+      return res
+        .status(404)
+        .json({ message: "No events found in this category" });
+    }
     res.status(200).json(events);
   } catch (err) {
     res.status(500).json({ message: err.message });

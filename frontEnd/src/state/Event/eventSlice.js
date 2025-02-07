@@ -20,7 +20,7 @@ export const fetchEvents = createAsyncThunk(
 export const createEvent = createAsyncThunk(
   "events/createEvent",
   async (formData, { rejectWithValue }) => {
-    const token = localStorage.getItem("token");
+    const token = await localStorage.getItem("token");
     try {
       const response = await axiosInstance.post(
         `/api/v1/event/create`,
@@ -87,6 +87,27 @@ export const deleteEvent = createAsyncThunk(
   }
 );
 
+export const fetchEventsByCategory = createAsyncThunk(
+  "events/fetchCategoryEvents",
+  async (categoryName, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `${API_BASE_URL}/api/v1/event/category/${categoryName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch events by category"
+      );
+    }
+  }
+);
+
 export const joinEvent = createAsyncThunk(
   "events/joinEvent",
   async ({ eventId, action }, { rejectWithValue }) => {
@@ -96,6 +117,7 @@ export const joinEvent = createAsyncThunk(
         { action },
         {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         }
@@ -166,8 +188,8 @@ const eventSlice = createSlice({
       })
       .addCase(deleteEvent.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = state.events?.events?.filter(
-          (event) => event._id != action.payload._id
+        state.events.events = state.events?.events?.filter(
+          (event) => event._id !== action.payload._id
         );
         state.error = null;
       })
@@ -182,12 +204,25 @@ const eventSlice = createSlice({
       .addCase(joinEvent.fulfilled, (state, action) => {
         state.loading = false;
         const updatedEvent = action.payload;
-        state.events = state.events.events.map((event) =>
+        state.events.events = state.events.events.map((event) =>
           event._id === updatedEvent._id ? updatedEvent : event
         );
         state.error = null;
       })
       .addCase(joinEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchEventsByCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEventsByCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events.events = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchEventsByCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
