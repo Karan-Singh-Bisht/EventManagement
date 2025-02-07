@@ -8,6 +8,7 @@ export default function EventCard({ event }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+
   const updatedEvent = useSelector((state) =>
     state.events.events.events.find((e) => e._id === event._id)
   );
@@ -15,8 +16,14 @@ export default function EventCard({ event }) {
   const attendeeCount =
     updatedEvent?.attendees.length || event.attendees.length;
 
+  const isJoined =
+    auth?.user?.user?._id &&
+    event?.attendees?.some(
+      (attendee) => attendee._id === auth?.user?.user?._id
+    );
+
   const handleRouting = () => {
-    navigate(`/update/${event._id}`);
+    navigate(`/update/${event?._id}`);
   };
 
   const handleEventDelete = () => {
@@ -26,27 +33,30 @@ export default function EventCard({ event }) {
   };
 
   const handleJoinButton = async (action) => {
-    if (auth.user) {
-      const response = await dispatch(
+    if (!auth.user) {
+      toast.error("Please log in to join this event");
+      return;
+    }
+    // Only dispatch joinEvent if the user is not already joined.
+    if (!isJoined) {
+      const resultAction = await dispatch(
         joinEvent({ eventId: event._id, action })
       );
-
-      if (response.payload) {
+      if (joinEvent.fulfilled.match(resultAction)) {
         toast.success("You have joined this event");
       } else {
-        toast.error("Failed to join event");
+        toast.error(resultAction.payload || "Failed to join event");
       }
-    } else {
-      toast.error("You need to log in to join this event");
     }
   };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 border border-gray-200">
       <img
+        onClick={() => navigate(`/eventDetails/${event._id}`)}
         src={event.image}
         alt={event.name}
-        className="w-full h-40 object-cover rounded-md"
+        className="w-full hover:cursor-pointer h-40 object-cover rounded-md"
       />
       <h3 className="text-lg font-semibold mt-2">{event.name}</h3>
       <p className="text-sm text-gray-600">
@@ -65,9 +75,14 @@ export default function EventCard({ event }) {
         <div>
           <button
             onClick={() => handleJoinButton("register")}
-            className="mt-4 mr-2 bg-indigo-600 font-semibold text-white py-2 px-4 rounded-md hover:bg-indigo-500"
+            className={`mt-4 mr-2 font-semibold text-white py-2 px-4 rounded-md ${
+              isJoined
+                ? "bg-green-600 hover:bg-green-500"
+                : "bg-indigo-600 hover:bg-indigo-500"
+            }`}
+            disabled={isJoined}
           >
-            Join
+            {isJoined ? "Joined" : "Join"}
           </button>
           {auth?.user?.user?._id === event?.user ? (
             <button

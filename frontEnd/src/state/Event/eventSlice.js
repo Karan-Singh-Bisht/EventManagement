@@ -132,6 +132,22 @@ export const joinEvent = createAsyncThunk(
   }
 );
 
+export const fetchEventById = createAsyncThunk(
+  "events/fetchEventById",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/event/${eventId}`
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch event by ID"
+      );
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: "events",
   initialState: {
@@ -204,9 +220,11 @@ const eventSlice = createSlice({
       .addCase(joinEvent.fulfilled, (state, action) => {
         state.loading = false;
         const updatedEvent = action.payload;
+        console.log(updatedEvent);
         state.events.events = state.events.events.map((event) =>
           event._id === updatedEvent._id ? updatedEvent : event
         );
+        state.event = action.payload;
         state.error = null;
       })
       .addCase(joinEvent.rejected, (state, action) => {
@@ -223,6 +241,19 @@ const eventSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchEventsByCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchEventById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEventById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.event = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchEventById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -8,6 +8,7 @@ import Modal from "../customer/components/Modal";
 import CreateEvent from "../customer/components/CreateEvent";
 import UpdateEvent from "../customer/components/UpdateEvent";
 import NotFound from "../customer/pages/NotFound";
+import EventDetails from "../customer/pages/EventDetails";
 
 const CustomerRoute = () => {
   return (
@@ -21,6 +22,7 @@ const CustomerRoute = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/createEvent" element={<CreateEvent />} />
         <Route path="/update/:eventId" element={<UpdateEvent />} />
+        <Route path="/eventDetails/:eventId" element={<EventDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

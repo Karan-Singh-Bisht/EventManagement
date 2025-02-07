@@ -11,7 +11,6 @@ import { getUser } from "../../state/Auth/authSlice.js";
 const HomePage = () => {
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.events);
-  console.log(events);
 
   const token = localStorage.getItem("token");
   const [selectedCategory, setSelectedCategory] = useState("");

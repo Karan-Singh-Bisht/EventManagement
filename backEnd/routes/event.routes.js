@@ -23,7 +23,7 @@ router.put(
   updateEvent
 );
 router.get("/", showAllEvents);
-router.get("/:eventId", verifyUserToken, showEvent);
+router.get("/:eventId", showEvent);
 router.get("/:eventId/attendees", verifyUserToken, showEventAttendees);
 router.post("/:eventId/rsvp", verifyUserToken, rsvpForEvent);
 router.delete("/:eventId", verifyUserToken, deleteEvent);

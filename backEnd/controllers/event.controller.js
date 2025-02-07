@@ -191,7 +191,7 @@ module.exports.getEventsByCategory = async (req, res) => {
     const { categoryName } = req.params;
 
     if (categoryName === "") {
-      return await Event.find();
+      return await Event.find().populate("attendees");
     }
     const events = await eventService.getEventsByCategory(categoryName);
     if (!events) {

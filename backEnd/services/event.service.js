@@ -37,7 +37,7 @@ const createEvent = async (eventData) => {
 
 const updateEventStatus = async (eventId, updatedFields, userId, io) => {
   try {
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(eventId).populate("attendees");
     if (!event) {
       throw new Error("Event not found");
     }
@@ -116,7 +116,7 @@ const showAllEvents = async (skip, limit) => {
 
 const rsvpForEvent = async (eventId, userId, action, io) => {
   try {
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(eventId).populate("attendees");
     if (!event) {
       throw new Error("Event not found");
     }
@@ -131,7 +131,7 @@ const rsvpForEvent = async (eventId, userId, action, io) => {
       throw new Error("Invalid action");
     }
 
-    const updatedEvent = await event.save();
+    const updatedEvent = (await event.save()).populate("attendees");
 
     return updatedEvent;
   } catch (err) {
@@ -163,7 +163,9 @@ const searchEvents = async (filters) => {
 
 const getEventsByCategory = async (categoryName) => {
   try {
-    const events = await Event.find({ category: categoryName });
+    const events = await Event.find({ category: categoryName }).populate(
+      "attendees"
+    );
     return events;
   } catch (err) {
     throw new Error("Error fetching events by category: " + err.message);

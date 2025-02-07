@@ -64,7 +64,7 @@ export default function Navigation() {
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
               <h1
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/")}
                 className="text-3xl hover:cursor-pointer md:text-5.5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text drop-shadow-lg"
               >
                 EM
