@@ -220,7 +220,6 @@ const eventSlice = createSlice({
       .addCase(joinEvent.fulfilled, (state, action) => {
         state.loading = false;
         const updatedEvent = action.payload;
-        console.log(updatedEvent);
         state.events.events = state.events.events.map((event) =>
           event._id === updatedEvent._id ? updatedEvent : event
         );

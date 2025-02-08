@@ -128,7 +128,7 @@ export default function Navigation() {
                   <span className="sr-only">Open user menu</span>
                   <img
                     alt=""
-                    src={auth?.user?.avatar}
+                    src={auth?.user?.user?.avatar}
                     className="size-8 rounded-full"
                   />
                 </MenuButton>

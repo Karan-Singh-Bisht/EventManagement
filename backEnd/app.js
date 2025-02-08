@@ -50,12 +50,10 @@ app.set("socketio", io);
 const authRoute = require("./routes/auth.routes");
 const userRoute = require("./routes/user.routes");
 const eventRoute = require("./routes/event.routes");
-const categoriesRoute = require("./routes/category.routes");
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/event", eventRoute);
-app.use("/api/v1/categories", categoriesRoute);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
