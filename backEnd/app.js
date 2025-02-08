@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const http = require("http");
 const path = require("path");
+const cron = require("node-cron");
 const db = require("./config/db");
 db();
 
@@ -16,6 +17,11 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
+
+// cron.schedule("*/5 * * * *", () => {
+//   exec("curl ");
+//   console.log("Corn running....");
+// });
 
 app.use(cors());
 app.use(express.json());
