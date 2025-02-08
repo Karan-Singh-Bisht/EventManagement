@@ -13,7 +13,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin:
+      "https://event-management-a0gsyrhde-karan-singh-bishts-projects.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
