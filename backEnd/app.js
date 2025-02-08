@@ -18,10 +18,10 @@ const io = new Server(server, {
   },
 });
 
-// cron.schedule("*/5 * * * *", () => {
-//   exec("curl ");
-//   console.log("Corn running....");
-// });
+cron.schedule("*/5 * * * *", () => {
+  exec("curl https://eventmanagement-iggq.onrender.com");
+  console.log("Corn running....");
+});
 
 app.use(cors());
 app.use(express.json());
