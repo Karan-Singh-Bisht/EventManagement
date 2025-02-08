@@ -59,17 +59,6 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
       updatedFields.image = eventImage?.url || event.image;
     }
 
-    if (updatedFields.date) {
-      const eventDate = new Date(updatedFields.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Start of today
-
-      // Check if the event date is in the past
-      if (eventDate < today) {
-        throw new Error("Event date cannot be in the past");
-      }
-    }
-
     const updatedEvent = await Event.findByIdAndUpdate(
       eventId,
       { $set: updatedFields }, //only update the provided fields
@@ -86,9 +75,9 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
     });
 
     return updatedEvent;
-  } catch (err) {
-    console.log(err);
-    throw err;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
 

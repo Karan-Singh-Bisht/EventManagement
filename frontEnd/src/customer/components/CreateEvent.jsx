@@ -62,7 +62,7 @@ const CreateEvent = () => {
       toast.success("Event created successfully");
       navigate("/");
     } else {
-      toast.error(`${error}`);
+      toast.error(`${event.payload}`);
     }
   };
 

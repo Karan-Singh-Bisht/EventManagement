@@ -71,12 +71,12 @@ const UpdateEvent = () => {
 
     const event = await dispatch(updateEvent({ formData, eventId }));
 
-    if (event) {
+    if (event.meta.requestStatus !== "rejected") {
       socket.emit("eventUpdated", event.payload);
       toast.success("Event updated successfully");
       navigate("/");
     } else {
-      toast.error("Failed to update event");
+      toast.error(`${event.payload}`);
     }
   };
 

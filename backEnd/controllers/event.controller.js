@@ -18,7 +18,7 @@ module.exports.createEvent = async (req, res) => {
       time,
       category,
     });
-    if (err || !newEvent) {
+    if (!newEvent) {
       return res.status(400).json({ message: err.message });
     }
 
@@ -70,7 +70,7 @@ module.exports.updateEvent = async (req, res) => {
       io
     );
     if (!updatedEvent) {
-      return res.status(404).json({ message: "Event not found" });
+      return res.status(404).json({ message: "Cannot Update Event" });
     }
     res.status(200).json(updatedEvent);
   } catch (err) {

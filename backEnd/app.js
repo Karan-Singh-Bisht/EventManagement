@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 
 // WebSocket Connection
 io.on("connection", (socket) => {
-  console.log("connect", () => {
+  socket.on("connect", () => {
     console.log("Client connected", socket.id);
   });
 
