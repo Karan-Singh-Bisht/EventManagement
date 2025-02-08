@@ -5,6 +5,14 @@ const createEvent = async (eventData) => {
   try {
     const { name, description, date, location, user, files, category, time } =
       eventData;
+    const eventDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    // Check if the event date is in the past
+    if (eventDate < today) {
+      throw new Error("Event date cannot be in the past");
+    }
     const eventImageLocalPath = files?.path;
     if (!eventImageLocalPath) {
       throw new Error("Event image is required");
@@ -16,7 +24,7 @@ const createEvent = async (eventData) => {
     const newEvent = await Event.create({
       name,
       description,
-      date,
+      date: eventDate,
       location,
       image: eventImage.url,
       user,
@@ -49,6 +57,17 @@ const updateEventStatus = async (eventId, updatedFields, userId, io) => {
     if (updatedFields.image) {
       const eventImage = await uploadOnCloudinary(updatedFields.image);
       updatedFields.image = eventImage?.url || event.image;
+    }
+
+    if (updatedFields.date) {
+      const eventDate = new Date(updatedFields.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of today
+
+      // Check if the event date is in the past
+      if (eventDate < today) {
+        throw new Error("Event date cannot be in the past");
+      }
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(

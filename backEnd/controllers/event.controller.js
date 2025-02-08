@@ -18,8 +18,8 @@ module.exports.createEvent = async (req, res) => {
       time,
       category,
     });
-    if (!newEvent) {
-      return res.status(400).json({ message: "Failed to create event" });
+    if (err || !newEvent) {
+      return res.status(400).json({ message: err.message });
     }
 
     io.emit("newEventCreated", newEvent);

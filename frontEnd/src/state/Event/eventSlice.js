@@ -33,7 +33,7 @@ export const createEvent = createAsyncThunk(
         }
       );
 
-      socket.emit("eventCreated", response.data);
+      socket.emit("eventCreated");
 
       return response.data;
     } catch (err) {
@@ -122,7 +122,7 @@ export const joinEvent = createAsyncThunk(
           },
         }
       );
-      socket.emit("eventAttendeesUpdated", response.data);
+      socket.emit("eventAttendeesUpdated");
       return response.data;
     } catch (err) {
       return rejectWithValue(
