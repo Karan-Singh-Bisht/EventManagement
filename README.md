@@ -59,3 +59,11 @@ EventManagement is a modern web application designed to simplify event creation,
 - npm or yarn
 - A MongoDB instance (local or cloud)
 
+### .env file structure
+
+ - PORT= 
+ - MONGODB_URI=
+ - JWT_SECRET=
+ - CLOUDINARY_CLOUD_NAME=
+ - CLOUDINARY_API_KEY=
+ - CLOUDINARY_API_SECRET=
