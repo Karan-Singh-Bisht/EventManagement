@@ -27,10 +27,6 @@ router.get("/:eventId", showEvent);
 router.get("/:eventId/attendees", verifyUserToken, showEventAttendees);
 router.post("/:eventId/rsvp", verifyUserToken, rsvpForEvent);
 router.delete("/:eventId", verifyUserToken, deleteEvent);
-router.get(
-  "/category/:categoryName([a-zA-Z]*)",
-  verifyUserToken,
-  getEventsByCategory
-);
+router.get("/category/:categoryName([a-zA-Z]*)", getEventsByCategory);
 
 module.exports = router;
