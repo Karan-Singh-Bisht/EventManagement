@@ -90,6 +90,16 @@ export default function Navigation() {
                     {item.name}
                   </a>
                 ))}
+                {auth.user ? (
+                  ""
+                ) : (
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-gray-400 p-1 w-[4vw] rounded-md"
+                  >
+                    Guest
+                  </button>
+                )}
               </div>
             </div>
           </div>
